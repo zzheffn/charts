@@ -37,8 +37,9 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | Parameter                                    | Description                                                                                                            | Default                      |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | `image.repository`                           | Image repository                                                                                                       | `jacobalberty/unifi`         |
-| `image.tag`                                  | Image tag. Possible values listed [here][docker].                                                                      | `5.9.29`                     |
+| `image.tag`                                  | Image tag. Possible values listed [here][docker].                                                                      | `5.11.50`                     |
 | `image.pullPolicy`                           | Image pull policy                                                                                                      | `IfNotPresent`               |
+| `strategyType`                               | Specifies the strategy used to replace old Pods by new ones                                                            | `Recreate`                   |
 | `guiService.type`                            | Kubernetes service type for the Unifi GUI                                                                              | `ClusterIP`                  |
 | `guiService.port`                            | Kubernetes port where the Unifi GUI is exposed                                                                         | `8443`                       |
 | `guiService.annotations`                     | Service annotations for the Unifi GUI                                                                                  | `{}`                         |
@@ -67,6 +68,13 @@ The following tables lists the configurable parameters of the Unifi chart and th
 | `discoveryService.loadBalancerIP`            | Loadbalance IP for AP discovery                                                                                        | `{}`                         |
 | `discoveryService.loadBalancerSourceRanges`  | List of IP CIDRs allowed access to load balancer (if supported)                                                        | None                         |
 | `discoveryService.externalTrafficPolicy`     | Set the externalTrafficPolicy in the Service to either Cluster or Local                                                | `Cluster`                    |
+| `unifiedService.enabled`                     | Use a single service for GUI, controller, STUN, and discovery                                                          | `false`                      |
+| `unifiedService.type`                        | Kubernetes service type for the unified service                                                                        | `ClusterIP`                  |
+| `unifiedService.annotations`                 | Annotations for the unified service                                                                                    | `{}`                         |
+| `unifiedService.labels`                      | Custom labels for the unified service                                                                                  | `{}`                         |
+| `unifiedService.loadBalancerIP`              | Load balancer IP for the unified service                                                                               | None                         |
+| `unifiedService.loadBalancerSourceRanges`    | List of IP CIDRs allowed access to the load balancer (if supported)                                                    | None                         |
+| `unifiedService.externalTrafficPolicy`       | Set the externalTrafficPolicy in the service to either Cluster or Local                                                | `Cluster`                    |
 | `ingress.enabled`                            | Enables Ingress                                                                                                        | `false`                      |
 | `ingress.annotations`                        | Ingress annotations                                                                                                    | `{}`                         |
 | `ingress.labels`                             | Custom labels                                                                                                          | `{}`                         |
@@ -124,9 +132,22 @@ Read through the [values.yaml](values.yaml) file. It has several commented out s
   with the controller using UDP. See [this article][ubnt 3] and [this other
   article][ubnt 4] for more information.
 
+## Ingress and HTTPS
+Unifi does [not support HTTP][unifi] so if you wish to use the guiService, you
+need to ensure that you use a backend transport of HTTPS.
+
+An example entry in `values.yaml` to achieve this is as follows:
+```
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+```
+
 [docker]: https://hub.docker.com/r/jacobalberty/unifi/tags/
 [github]: https://github.com/jacobalberty/unifi-docker
 [ubnt]: https://www.ubnt.com/
 [ubnt 2]: https://unifi-sdn.ubnt.com/
 [ubnt 3]: https://help.ubnt.com/hc/en-us/articles/204976094-UniFi-What-protocol-does-the-controller-use-to-communicate-with-the-UAP-
 [ubnt 4]: https://help.ubnt.com/hc/en-us/articles/115015457668-UniFi-Troubleshooting-STUN-Communication-Errors
+[unifi]: https://community.ui.com/questions/Controller-how-to-deactivate-http-to-https/c5e247d8-b5b9-4c84-a3bb-28a90fd65668

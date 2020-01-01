@@ -55,6 +55,10 @@ spec:
       hostAliases:
 {{ toYaml .Values.nexus.hostAliases | indent 8 }}
       {{- end }}
+      {{- if .Values.nexus.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.nexus.imagePullSecret }}
+      {{- end }}
       containers:
         - name: nexus
           image: {{ .Values.nexus.imageName }}:{{ .Values.nexus.imageTag }}
@@ -107,6 +111,9 @@ spec:
             - mountPath: {{ .Values.secret.mountPath }}
               name: {{ template "nexus.name" . }}-secret
               readOnly: {{ .Values.secret.readOnly }}
+            {{- end }}
+            {{- if .Values.deployment.additionalVolumeMounts}}
+{{ toYaml .Values.deployment.additionalVolumeMounts | indent 12 }}
             {{- end }}
           {{- if .Values.nexusProxy.enabled }}
         - name: nexus-proxy

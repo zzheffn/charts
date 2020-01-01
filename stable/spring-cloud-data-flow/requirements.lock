@@ -1,12 +1,21 @@
 dependencies:
 - name: mysql
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.3.4
-- name: redis
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.1.11
+  version: 1.1.0
 - name: rabbitmq
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 0.6.16
-digest: sha256:b16ffdc5da316b3a7e677d3a83670341b13670d7e59f8ce74d023a01df05f135
-generated: 2018-01-31T09:21:26.470351-05:00
+- name: rabbitmq-ha
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 1.27.1
+- name: kafka
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  version: 0.13.11
+- name: prometheus
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 9.3.1
+- name: grafana
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 4.0.2
+digest: sha256:67025c3ac98c98e9b1530c00d199217fb74b50202226b36756c213ac0617795d
+generated: "2019-12-06T09:19:02.158505764-05:00"

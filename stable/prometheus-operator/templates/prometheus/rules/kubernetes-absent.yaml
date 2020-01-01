@@ -1,12 +1,13 @@
-# Generated from 'kubernetes-absent' group from https://raw.githubusercontent.com/coreos/prometheus-operator/master/contrib/kube-prometheus/manifests/prometheus-rules.yaml
+# Generated from 'kubernetes-absent' group from https://raw.githubusercontent.com/coreos/kube-prometheus/release-0.1/manifests/prometheus-rules.yaml
 # Do not change in-place! In order to change this file first read following link:
 # https://github.com/helm/charts/tree/master/stable/prometheus-operator/hack
-{{- if and .Values.defaultRules.create .Values.defaultRules.rules.kubernetesAbsent }}
+{{- $kubeTargetVersion := default .Capabilities.KubeVersion.GitVersion .Values.kubeTargetVersionOverride }}
+{{- if and (semverCompare ">=1.10.0-0" $kubeTargetVersion) (semverCompare "<1.14.0-0" $kubeTargetVersion) .Values.defaultRules.create .Values.defaultRules.rules.kubernetesAbsent }}
 {{- $operatorJob := printf "%s-%s" (include "prometheus-operator.fullname" .) "operator" }}
 {{- $prometheusJob := printf "%s-%s" (include "prometheus-operator.fullname" .) "prometheus" }}
 {{- $alertmanagerJob := printf "%s-%s" (include "prometheus-operator.fullname" .) "alertmanager" }}
 {{- $namespace := .Release.Namespace }}
-apiVersion: {{ printf "%s/v1" (.Values.prometheusOperator.crdApiGroup | default "monitoring.coreos.com") }}
+apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: {{ printf "%s-%s" (include "prometheus-operator.fullname" .) "kubernetes-absent" | trunc 63 | trimSuffix "-" }}
@@ -24,6 +25,7 @@ spec:
   groups:
   - name: kubernetes-absent
     rules:
+{{- if .Values.alertmanager.enabled }}
     - alert: AlertmanagerDown
       annotations:
         message: Alertmanager has disappeared from Prometheus target discovery.
@@ -32,6 +34,7 @@ spec:
       for: 15m
       labels:
         severity: critical
+{{- end }}
 {{- if .Values.kubeDns.enabled }}
     - alert: CoreDNSDown
       annotations:
